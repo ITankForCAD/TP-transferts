@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <SDL2/SDL.h>
+#include <unistd.h>
 #define SIMULATION_TIME 10
 
 using namespace std;
@@ -12,7 +13,7 @@ class Clock {
         long double dt;
     Clock () {
         time = 0;
-        dt = 0.000125;
+        dt = 0.1;
     }
     void next(){
         time += dt;
@@ -53,24 +54,35 @@ class Heat: public Clock {
             ke = 1.031;
             L = 1.6;
             dx = L/(Qn-1);
-            T_entre = 900; 
-            T.assign(Qn,500);
-            T_p.assign(Qn,500);
+            T_entre = 300; 
+            T.assign(Qn,900);
+            T_p.assign(Qn,900);
             T_p[0] = T_entre;
-            S_ini = 1;
+            T[0] = T_entre;
+            S_ini = 0.9;
             Speed.assign(Qn,S_ini);
         }
 
         void compute_single(void){
+            T.at(0) = T_entre;
             for (int i=1; i < Qn-1; i++) {
                 int im1 = i-1;
                 int ip1 = i+1;
                 Rf = Speed[im1]*Rf;
-                long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf/pow(dx,2)*(T_p[i]-T_p[im1]))) +T_p[i];
+                long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
                 T.at(i) = res;
             }
             // Bondary conditions
             T.at(Qn-1) = T[Qn-2]; 
+        }
+        void assign_speed(void){
+            long double speed_ini = 2000;
+            long double speed_final = 6000;
+            for (int i=0; i<Qn ;i++ ){
+                long double x = 
+            }
+            // y = mx + b
+
         }
         
 
@@ -142,7 +154,7 @@ int main (void){
     
     bool done = false;
 
-    SDL_Window* window = SDL_CreateWindow("Corde différences finies",500,200,600,400,SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow("Température dans le garnissage",500,200,600,400,SDL_WINDOW_SHOWN);
     SDL_Renderer* renderer = nullptr;
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
     int j = 0;
@@ -173,7 +185,7 @@ int main (void){
         my_guitar.compute_single();
         my_guitar.replace_single();
         my_guitar.next();
-
+        my_guitar.plotter(renderer);
     }
     SDL_DestroyWindow(window);
 

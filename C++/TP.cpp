@@ -43,7 +43,8 @@ class Heat: public Clock {
         long double dx;
         long double L;
         long double T_entre;
-        long double S_ini;
+        long double speed_ini;
+        long double speed_final;
         vector <long double> T;
         vector <long double> T_p;
         vector <long double> Speed;
@@ -59,8 +60,9 @@ class Heat: public Clock {
             T_p.assign(Qn,900);
             T_p[0] = T_entre;
             T[0] = T_entre;
-            S_ini = 0.9;
-            Speed.assign(Qn,S_ini);
+            long double speed_ini = 2000;
+            long double speed_final = 6000;
+            assign_speed();
         }
 
         void compute_single(void){
@@ -76,13 +78,14 @@ class Heat: public Clock {
             T.at(Qn-1) = T[Qn-2]; 
         }
         void assign_speed(void){
-            long double speed_ini = 2000;
-            long double speed_final = 6000;
-            for (int i=0; i<Qn ;i++ ){
-                long double x = 
-            }
             // y = mx + b
-
+            Speed.assign(Qn,0);
+            for (int i=0; i < Qn ; i++ ) {
+                long double res = (i*dx/L)*speed_final + speed_ini;
+                cout << res  << " ";
+                Speed.at(i) = res;
+            }
+            cout << "\n";
         }
         
 
@@ -185,7 +188,7 @@ int main (void){
         my_guitar.compute_single();
         my_guitar.replace_single();
         my_guitar.next();
-        my_guitar.plotter(renderer);
+        // my_guitar.plotter(renderer);
     }
     SDL_DestroyWindow(window);
 

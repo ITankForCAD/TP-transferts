@@ -65,17 +65,29 @@ extern "C++" class Heater: public Clock {
         }
 
         void compute_single(int phase /* 1 2 ou 3 */){
-            if (phase != 3) {T_entre = 565+273;}
-            T.at(0) = T_entre;
-            for (int i=1; i < Qn-1; i++) {
-                int im1 = i-1;
-                int ip1 = i+1;
-                Rf = Speed[im1]*Rf;
-                long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
-                T.at(i) = res;
-            }
-            // Bondary conditions
-            T.at(Qn-1) = T[Qn-2]; 
+            if (phase != 3) {
+                T.at(0) = T_p[0];
+                for (int i=1; i < Qn-1; i++) {
+                    int im1 = i-1;
+                    int ip1 = i+1;
+                    Rf = Speed[im1]*Rf;
+                    long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
+                    T.at(i) = res;
+                }
+                // Bondary conditions
+                T.at(Qn-1) = T[Qn-2];
+                }
+            else {
+                T.at(Qn-1) = T_p[Qn-1];
+                for (int i=1; i < Qn-1; i++) {
+                    int im1 = i-1;
+                    int ip1 = i+1;
+                    Rf = Speed[im1]*Rf;
+                    long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
+                    T.at(i) = res;
+                }
+                T.at(0) = T[1];
+                }
         }
         void assign_speed(void){
             // première approximation, vitesse linéaire avec la distance en x
@@ -99,17 +111,19 @@ extern "C++" class Heater: public Clock {
         }
         
         void test(){
-        clean();
-        write();
-        replace_single();
-        next();
-            while(time < SIMULATION_TIME){
-                compute_single(1);
-                write();
-                replace_single();
-                next();
+            int phase;
+            clean();
+            write();
+            replace_single();
+            next();
+                while(time < SIMULATION_TIME){
+                    (time < SIMULATION_TIME*2/3 && time > SIMULATION_TIME/3) ? phase = 3 : phase = 1;
+                    compute_single(phase);
+                    write();
+                    replace_single();
+                    next();
+                }
             }
-        }
         void clean(void) {
             ofstream File("data.txt");
             File.close();

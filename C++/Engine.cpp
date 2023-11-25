@@ -2,11 +2,10 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
-#define SIMULATION_TIME 720
+//#define SIMULATION_TIME 80*3
 
 using namespace std;
-
-extern "C++" class Clock {
+class Clock {
     public:
         long double time;
         long double dt;
@@ -33,57 +32,80 @@ long double remap (long double value, long double low1, long double high1, long 
         return res;
     }
 
-extern "C++" class Heater: public Clock {
+class Heater: public Clock {
     public:
+        int SIMULATION_TIME;
         int Qn;
+        int phase; //1 gaz inlet, 2 purge, 3 outlet//
+        long double phase_time;
+        long double T_entre;
+        long double T_bruleur;
         long double Re;
         long double ke;
         long double Rf;
         long double dx;
         long double L;
-        long double T_entre;
         long double speed_ini;
         long double speed_final;
+        vector <vector <long double> > data;
         vector <long double> T;
         vector <long double> T_p;
         vector <long double> Speed;
-        Heater(void){
-            Qn = 21;
+        Heater(float Long,float si,float sf ,int nt){
+            SIMULATION_TIME =  80*nt;
+            phase_time = 80;
+            T_entre = 154 + 273;
+            T_bruleur = 820 + 273;
+            phase = 1;
+            Qn = 41;
             Re = 1.0605 * 1300.1934; //rho cp equivalent
             Rf = (1.121 * 0.3868); // rho cp du fluide
             ke = 1.031; // coeff de conduction equivalent
-            L = 1.6; // longueur du milieu
+            L = Long; // longueur du milieu
             dx = L/(Qn-1);
-            T_entre = 300; 
-            T.assign(Qn,900);
-            T_p.assign(Qn,900);
-            T_p[0] = T_entre;
-            T[0] = T_entre;
-            speed_ini = 0.1;
-            speed_final = 0.2;
-            assign_speed();
-        }
+            cout << "discrétisation (dx) : " << dx << " [m]"<< endl;
+            cout << "discrétisation (dt) : " << dt << " [s]"<< endl;
+            T.assign(Qn,0);
+            T_p.assign(Qn,0);
+            speed_ini = si; // 0.3
+            speed_final = sf; // 0.6
+            Speed.assign(Qn,0.9);
+            //assign_speed();
+            initialize_temp();
 
-        void compute_single(int phase /* 1 2 ou 3 */){
-            if (phase != 3) {
-                T.at(0) = T_p[0];
+        }
+        void initialize_temp(){
+            /*Initialize temperature with experimental values*/
+            long double A = 449 + 273;
+            long double B = 510 + 273;
+            long double C = 602 + 273;
+            for (int i=0; i < Qn; i++){
+                if (i <= Qn/3) {T_p.at(i) = A; T.at(i) = A;}
+                else if (i > Qn/3 && i < Qn*2/3) {T_p.at(i) = B; T.at(i) = B;}
+                else {T_p.at(i) = C; T.at(i) = C;}
+            }
+        }
+        void compute_single(){
+            assign_phase();
+            if (phase != 2/*/ gaz inlet  & purge */) {
+                T.at(0) = T_entre;
                 for (int i=1; i < Qn-1; i++) {
                     int im1 = i-1;
                     int ip1 = i+1;
-                    Rf = Speed[im1]*Rf;
-                    long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
+                    long double Rf_eq = Speed[i]*Rf;
+                    long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf_eq/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
                     T.at(i) = res;
                 }
                 // Bondary conditions
                 T.at(Qn-1) = T[Qn-2];
                 }
-            else {
-                T.at(Qn-1) = T_p[Qn-1];
+            else { /* gaz outlet */
+                T.at(Qn-1) = T_bruleur;
                 for (int i=1; i < Qn-1; i++) {
                     int im1 = i-1;
                     int ip1 = i+1;
-                    Rf = Speed[im1]*Rf;
-                    long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
+                    long double Rf_eq = -Speed[i]*Rf;
+                    long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf_eq/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
                     T.at(i) = res;
                 }
                 T.at(0) = T[1];
@@ -92,7 +114,7 @@ extern "C++" class Heater: public Clock {
         void assign_speed(void){
             // première approximation, vitesse linéaire avec la distance en x
             // y = mx + b
-            Speed.assign(Qn,0);
+            
             for (int i=0; i < Qn ; i++ ) {
                 long double res = (i*dx/L)*(speed_final-speed_ini) + speed_ini;
                 Speed.at(i) = res;
@@ -109,16 +131,28 @@ extern "C++" class Heater: public Clock {
             }
             cout << "\n";
         }
-        
+        void assign_phase(){ 
+            int i = floor(time/phase_time);
+                switch ( i % 3)  {
+                    case 0:
+                        phase = 1;
+                        break;
+                    case 1:
+                        phase = 2;
+                        break;
+                    default: //case 2
+                        phase = 3;
+                        break;
+            }
+        }
         void test(){
-            int phase;
             clean();
             write();
             replace_single();
             next();
                 while(time < SIMULATION_TIME){
-                    (time < SIMULATION_TIME*2/3 && time > SIMULATION_TIME/3) ? phase = 3 : phase = 1;
-                    compute_single(phase);
+                    if (time > 40.1 && time < 40.2) {assign_speed();}
+                    compute_single();
                     write();
                     replace_single();
                     next();
@@ -128,7 +162,7 @@ extern "C++" class Heater: public Clock {
             ofstream File("data.txt");
             File.close();
         }
-        void write(void) {
+        void write() {
             ofstream File("data.txt",std::ios_base::app);
             for (int i = 0; i != Qn; i++){
                 File << T.at(i) << " ";
@@ -138,18 +172,27 @@ extern "C++" class Heater: public Clock {
             File << "\n";
             File.close();
         }
-// vector <vector <long double> > Simulate_to(int time) {
-//     vector < vector <long double> > mesh;
-//     for (Heater garnissage = Heater(); garnissage.get_time() < time; garnissage.next()){
-//         garnissage.compute_single();
-//         mesh.push_back(garnissage.T);
-//         garnissage.replace_single();
-//     }
-//     return mesh;
-//}
-
+        void stock_data (){
+            data.push_back(T);
+        }
 };
+
 int main(int argc, char* argv[]) {
-    Heater h = Heater();
+    // ./Engine 300 1.6 -> définir Temperature initiale "300" et Longueur du garnissage "1.6" 
+    float L = atof(argv[1]);
+    float si = atof(argv[2]);
+    float sf = atof(argv[3]);
+    int nt = atoi(argv[4]);
+    // float nt = 6;
+    // float L = 1.6;
+    // float si = 2;
+    // float sf = 4;
+    cout << "*génération des données* " << endl << " " << endl;
+    cout << "longueur du garnisage : " << L << " [m]" << endl;
+    cout << "temps de la simulation : " << 80*nt << " [s]" << endl;
+    cout << "vitesse initial : " << si << " [m/s]" << endl;
+    cout << "vitesse finale : " << sf << " [m/s]" << endl;
+    cout << "nombre de changement de phase : " << nt  << endl;
+    Heater h = Heater(L,si,sf, nt);
     h.test();
 }

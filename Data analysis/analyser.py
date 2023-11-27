@@ -15,7 +15,7 @@ fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 
 surface = ax.plot_surface(T, X, data, cmap=cm.coolwarm, linewidth=0, antialiased=False)
 
-ax.set_zlim(400, 1200)
+ax.set_zlim(np.min(data), np.max(data))
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter("{x:.2f}")
 ax.tick_params(axis='z', labelsize='smaller')

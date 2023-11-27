@@ -1,7 +1,7 @@
 - [x] Créer l'engine pour résoudre l'équation différentiel en C++
 - [x] implémenter les changement de phase (1,2,3)/purge/entré/sortie dans la classe Heater
-- [ ] Trouver les bonnes conditions initiales pour les extrémités et T_p
-- [x] Implémenter un bridge de la classe Heat C++ vers python [[https://stackoverflow.com/questions/18342535/calling-c-function-from-python-script-on-a-mac-osx]] -> voir simple yet effective way mehhh -> fichier txt
+- [x] Trouver les bonnes conditions initiales pour les extrémités et T_p
+- [x] Implémenter un bridge de la classe Heat C++ vers python [[https://stackoverflow.com/questions/18342535/calling-c-function-from-python-script-on-a-mac-osx]] -> voir simple yet effective way mehhh -> fichier.txt
 - [x] générer graphique 2D T(x,t) sur un cycle en python
 - [ ] vérifier la précision du simulateur VS les données réels avec des graphiques et % d'écarts
 - [ ] vérifier ce qui se produit si on augmentait ou diminuait la hauteur du garnissage de 50% en termes de performance thermique

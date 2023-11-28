@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include "nlohmann-json/3.11.2/include/nlohmann/json.hpp"
 //#define SIMULATION_TIME 80*3
 
 using namespace std;
@@ -47,21 +48,23 @@ class Heater: public Clock {
         long double L;
         long double speed_ini;
         long double speed_final;
+        long double rcp_garn;
         vector <vector <long double> > data;
         vector <long double> T;
         vector <long double> T_p;
         vector <long double> Speed;
-        Heater(float Long,float si,float sf ,int nt){
-            SIMULATION_TIME =  80*nt;
+        Heater(float Length,float si,float sf ,int nt){
             phase_time = 80;
+            SIMULATION_TIME =  phase_time*nt;
             T_entre = 154 + 273;
             T_bruleur = 820 + 273;
             phase = 1;
             Qn = 41;
-            Re = 1.0605 * 1300.1934; //rho cp equivalent
-            Rf = (1.121 * 0.3868); // rho cp du fluide
+            rcp_garn = 2600*1;
+            Rf = (1.121 * 0.3868) ; // rho cp du fluide
+            Re = (rcp_garn+Rf/2);//1.0605 * 1300.1934; //rho cp equivalent
             ke = 1.031; // coeff de conduction equivalent
-            L = Long; // longueur du milieu
+            L = Length; // longueur du milieu
             dx = L/(Qn-1);
             cout << "discrétisation (dx) : " << dx << " [m]"<< endl;
             cout << "discrétisation (dt) : " << dt << " [s]"<< endl;
@@ -72,7 +75,25 @@ class Heater: public Clock {
             Speed.assign(Qn,0.9);
             //assign_speed();
             initialize_temp();
-
+            }
+        void write_attribute(void){
+            ofstream attr( "attribute.txt" );
+            nlohmann::json j;
+            j["Qn"] = Qn;
+            j["dt"] = dt;
+            j["dx"] = dx;
+            j["longueur"] = L;
+            j["temps_de_phase"] = phase_time;
+            j["temperature_entre"] = T_entre;
+            j["temperature_bruleur"] = T_bruleur;
+            j["ke"] = ke;
+            j["rcp_eq"] = Re;
+            j["rcp_garnissage"] = rcp_garn;
+            j["rcp_fluide"] = Rf;
+            j["vitesse_initiale"] = speed_ini;
+            j["vitesse_finale"] = speed_final;
+            attr << j ;
+            attr.close();
         }
         void initialize_temp(){
             /*Initialize temperature with experimental values*/
@@ -157,6 +178,7 @@ class Heater: public Clock {
                     replace_single();
                     next();
                 }
+            write_attribute();
             }
         void clean(void) {
             ofstream File("data.txt");
@@ -180,8 +202,8 @@ class Heater: public Clock {
 int main(int argc, char* argv[]) {
     // ./Engine 300 1.6 -> définir Temperature initiale "300" et Longueur du garnissage "1.6" 
     float L = atof(argv[1]);
-    float si = atof(argv[2]);
-    float sf = atof(argv[3]);
+    float si = atof(argv[2]); // utilisé 1
+    float sf = atof(argv[3]); //  utilisé 1.5
     int nt = atoi(argv[4]);
     // *Debug*
     // float nt = 6;

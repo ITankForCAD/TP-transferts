@@ -1,3 +1,3 @@
 all: Engine.cpp
-	clang++ Engine.cpp -o Engine
+	clang++ -std=c++17 Engine.cpp -o Engine
 

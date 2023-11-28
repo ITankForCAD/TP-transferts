@@ -54,7 +54,7 @@ class Heater: public Clock {
         vector <long double> T_p;
         vector <long double> Speed;
         Heater(float Length,float si,float sf ,int nt){
-            phase_time = 80;
+            phase_time = 120;
             SIMULATION_TIME =  phase_time*nt;
             T_entre = 154 + 273;
             T_bruleur = 820 + 273;

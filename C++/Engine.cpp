@@ -60,9 +60,9 @@ class Heater: public Clock {
             T_bruleur = 820 + 273;
             phase = 1;
             Qn = 41;
-            rcp_garn = 2600*1;
+            rcp_garn = 2600;
             Rf = (1.121 * 0.3868) ; // rho cp du fluide
-            Re = (rcp_garn+Rf/2);//1.0605 * 1300.1934; //rho cp equivalent
+            Re = ((rcp_garn+Rf)/2);//1.0605 * 1300.1934; //rho cp equivalent
             ke = 1.031; // coeff de conduction equivalent
             L = Length; // longueur du milieu
             dx = L/(Qn-1);

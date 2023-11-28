@@ -6,7 +6,7 @@ from matplotlib.ticker import LinearLocator
 from mpl_toolkits.mplot3d import Axes3D
 
 
-data = np.loadtxt("C++\data.txt")
+data = np.loadtxt("data.txt")
 x = np.linspace(0,data.shape[1],num=data.shape[1])
 t = np.linspace(0,data.shape[0],num=data.shape[0])
 X,T = np.meshgrid(x,t)

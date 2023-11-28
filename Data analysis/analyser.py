@@ -6,7 +6,7 @@ from matplotlib.ticker import LinearLocator
 from mpl_toolkits.mplot3d import Axes3D
 
 
-data = np.loadtxt("data.txt")
+data = np.loadtxt("/Users/antoine/Desktop/GPH/A2023/TransfertTermique/TP/TP-transferts/C++/data.txt")
 x = np.linspace(0,data.shape[1],num=data.shape[1])
 t = np.linspace(0,data.shape[0],num=data.shape[0])
 X,T = np.meshgrid(x,t)
@@ -24,7 +24,7 @@ ax.tick_params(axis='y', labelsize='smaller')
 fig.colorbar(surface, shrink=0.5, aspect=5, location="bottom")
 ax.set_xlabel("t [s]")
 ax.set_ylabel("x [m]")
-ax.set_zlabel("Temp [$\degree C $]", labelpad=20)
+ax.set_zlabel("Temp [$\degree K $]", labelpad=20)
 ax.zaxis.set_rotate_label(False)
 plt.show()
 

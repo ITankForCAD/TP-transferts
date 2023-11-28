@@ -183,6 +183,7 @@ int main(int argc, char* argv[]) {
     float si = atof(argv[2]);
     float sf = atof(argv[3]);
     int nt = atoi(argv[4]);
+    // *Debug*
     // float nt = 6;
     // float L = 1.6;
     // float si = 2;

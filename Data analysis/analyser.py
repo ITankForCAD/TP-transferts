@@ -5,9 +5,9 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator
 from mpl_toolkits.mplot3d import Axes3D
 
-data = np.loadtxt("/Users/antoine/Desktop/GPH/A2023/TransfertTermique/TP/TP-transferts/C++/data.txt")
+# data = np.loadtxt("/Users/antoine/Desktop/GPH/A2023/TransfertTermique/TP/TP-transferts/C++/data.txt")
 # data = np.loadtxt("C:\\Users\\xayga\\Desktop\\Code\\TP-transferts\\data.txt")
-
+data = np.loadtxt("C++\data.txt")
 
 x = np.linspace(0,1.6,num=data.shape[1])
 t = np.linspace(0,120,num=data.shape[0])

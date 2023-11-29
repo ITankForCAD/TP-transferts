@@ -92,6 +92,7 @@ class Heater: public Clock {
             j["rcp_fluide"] = Rf;
             j["vitesse_initiale"] = speed_ini;
             j["vitesse_finale"] = speed_final;
+            j["temps_simulation"] = SIMULATION_TIME;
             attr << j ;
             attr.close();
         }
@@ -212,7 +213,7 @@ int main(int argc, char* argv[]) {
     // float sf = 4;
     cout << "*génération des données* " << endl << " " << endl;
     cout << "longueur du garnisage : " << L << " [m]" << endl;
-    cout << "temps de la simulation : " << 80*nt << " [s]" << endl;
+    cout << "temps de la simulation : " << 120*nt << " [s]" << endl;
     cout << "vitesse initial : " << si << " [m/s]" << endl;
     cout << "vitesse finale : " << sf << " [m/s]" << endl;
     cout << "nombre de changement de phase : " << nt  << endl;

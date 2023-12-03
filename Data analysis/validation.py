@@ -8,4 +8,7 @@ filepath = sys.path[0] + "\data.csv"
 # TODO fonctions pour comparer nos résultats avec les données expérimentales
 
 data = Nettoyeur(filepath)
-data.to_csv("clean_data.csv", index=False)
+
+plt.plot(data["DATE"], data["V3 (in 3)"])
+plt.plot(data["DATE"], data["V6 (out 3)"])
+plt.show()

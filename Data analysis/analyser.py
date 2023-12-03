@@ -49,8 +49,8 @@ def profil():
     axs[0].yaxis.set_major_formatter("{x:.1f}")
     axs[0].set_xlabel("Temps [min]")
     axs[0].set_ylabel("Temp [$\degree K $]", labelpad=30)
-    axs[0].plot(t, temp_0, color="b")
-    axs[0].plot(t, temp_8, color="orange")
+    # axs[0].plot(t, temp_0, color="b")
+    # axs[0].plot(t, temp_8, color="orange")
     axs[0].plot(t, temp_16, color="g")
     
     axs[1].yaxis.set_major_locator(LinearLocator(10))

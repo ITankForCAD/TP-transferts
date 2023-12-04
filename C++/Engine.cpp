@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
-#include "nlohmann-json/3.11.2/include/nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 //#define SIMULATION_TIME 80*3
 
 using namespace std;
@@ -49,17 +49,19 @@ class Heater: public Clock {
         long double speed_ini;
         long double speed_final;
         long double rcp_garn;
+        int nt;
         vector <vector <long double> > data;
         vector <long double> T;
         vector <long double> T_p;
         vector <long double> Speed;
         Heater(float Length,float si,float sf ,int nt){
+            nt = nt;
             phase_time = 120;
             SIMULATION_TIME =  phase_time*nt;
-            T_entre = 154 + 273;
+            T_entre = 440 + 273;
             T_bruleur = 820 + 273;
             phase = 1;
-            Qn = 41;
+            Qn = 60;
             rcp_garn = 2600;
             Rf = (1.121 * 0.3868) ; // rho cp du fluide
             Re = ((rcp_garn+Rf)/2);//1.0605 * 1300.1934; //rho cp equivalent
@@ -73,15 +75,16 @@ class Heater: public Clock {
             speed_ini = si; // 0.3
             speed_final = sf; // 0.6
             Speed.assign(Qn,0.9);
-            //assign_speed();
+            assign_speed();
             initialize_temp();
             }
         void write_attribute(void){
-            ofstream attr( "attribute.txt" );
+            ofstream attr( "attribute.json" );
             nlohmann::json j;
             j["Qn"] = Qn;
             j["dt"] = dt;
             j["dx"] = dx;
+            j["nt"] = nt;
             j["longueur"] = L;
             j["temps_de_phase"] = phase_time;
             j["temperature_entre"] = T_entre;
@@ -98,9 +101,9 @@ class Heater: public Clock {
         }
         void initialize_temp(){
             /*Initialize temperature with experimental values*/
-            long double A = 449 + 273;
-            long double B = 510 + 273;
-            long double C = 602 + 273;
+            long double A = 819;
+            long double B = 920;
+            long double C = 1026;
             for (int i=0; i < Qn; i++){
                 if (i <= Qn/3) {T_p.at(i) = A; T.at(i) = A;}
                 else if (i > Qn/3 && i < Qn*2/3) {T_p.at(i) = B; T.at(i) = B;}
@@ -109,7 +112,7 @@ class Heater: public Clock {
         }
         void compute_single(){
             assign_phase();
-            if (phase != 2/*/ gaz inlet  & purge */) {
+            if (phase != 3/*/ gaz inlet  & purge */) {
                 T.at(0) = T_entre;
                 for (int i=1; i < Qn-1; i++) {
                     int im1 = i-1;
@@ -173,7 +176,6 @@ class Heater: public Clock {
             replace_single();
             next();
                 while(time < SIMULATION_TIME){
-                    if (time > 40.1 && time < 40.2) {assign_speed();}
                     compute_single();
                     write();
                     replace_single();

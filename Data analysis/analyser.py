@@ -6,14 +6,18 @@ from matplotlib.ticker import LinearLocator
 from mpl_toolkits.mplot3d import Axes3D
 import os
 import json
+
 analyser_path = os.path.dirname(os.path.abspath(__file__))
-data = np.loadtxt("/Users/antoine/Desktop/GPH/A2023/TransfertTermique/TP/TP-transferts/C++/data.txt")
-data_exp = pd.read_csv('/Users/antoine/Desktop/GPH/A2023/TransfertTermique/TP/TP-transferts/clean_data.csv')
-#data = np.loadtxt("C:\\Users\\xayga\\Desktop\\Code\\TP-transferts\\data.txt")
-#data_exp = pd.read_csv("C:\\Users\\xayga\\Desktop\\Code\\TP-transferts\\clean_data.csv")
-with open("attribute.json") as f:
+data_path = os.path.join(os.path.split(analyser_path)[0],os.path.join("C++","data.txt"))
+json_path = os.path.join(os.path.split(analyser_path)[0],os.path.join("C++","attribute.json"))
+clean_data_path = os.path.join(analyser_path,"clean_data.csv")
+
+data = np.loadtxt(data_path)
+data_exp = pd.read_csv(clean_data_path)
+
+with open(json_path) as f:
     att = json.load(f)
-#print(att["temps"])
+
 temps_de_phase = att["temps_de_phase"]
 
 x = np.linspace(0,att["longueur"],num=data.shape[1])
@@ -39,9 +43,9 @@ def plot3D():
     ax.tick_params(axis='x', labelsize='smaller')
     ax.tick_params(axis='y', labelsize='smaller')
     fig.colorbar(surface, shrink=0.5, aspect=5, location="bottom")
-    ax.set_xlabel("t [min]")
-    ax.set_ylabel("x [m]", labelpad=10)
-    ax.set_zlabel("Temp [$\degree K $]", labelpad=30)
+    ax.set_xlabel("Temps [min]")
+    ax.set_ylabel("Distance [m]", labelpad=10)
+    ax.set_zlabel("Température [$\degree K $]", labelpad=30)
     ax.zaxis.set_rotate_label(False)
     ax.yaxis.set_rotate_label(False)
     ax.view_init(elev=25, azim=-113, roll=0)
@@ -62,7 +66,7 @@ def profil():
     axs.yaxis.set_major_locator(LinearLocator(10))
     axs.yaxis.set_major_formatter("{x:.1f}")
     axs.set_xlabel("Temps [min]")
-    axs.set_ylabel("Temp [$\degree K $]", labelpad=30)
+    axs.set_ylabel("Température [$\degree K $]", labelpad=30)
     axs.plot(t, temp_0,linestyle="--" ,color="b", label="Température simulée à T3")
     axs.plot(t, temp_8,linestyle="--" ,color="orange", label="Température simulée à T4")
     axs.plot(t, temp_16,linestyle="--" ,color="g", label="Température simulée à T5")
@@ -77,5 +81,5 @@ def profil():
     axs.legend()
     plt.show()
     
-profil()
-#plot3D()
+#profil()
+plot3D()

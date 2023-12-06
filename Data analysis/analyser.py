@@ -11,7 +11,8 @@ analyser_path = os.path.dirname(os.path.abspath(__file__))
 data_path = os.path.join(os.path.split(analyser_path)[0],os.path.join("C++","data.txt"))
 json_path = os.path.join(os.path.split(analyser_path)[0],os.path.join("C++","attribute.json"))
 clean_data_path = os.path.join(analyser_path,"clean_data.csv")
-
+# data_path = "C:\\Users\\xayga\\Desktop\\Code\\TP-transferts\\data.txt"
+# json_path = "C:\\Users\\xayga\\Desktop\\Code\\TP-transferts\\attribute.json"
 data = np.loadtxt(data_path)
 data_exp = pd.read_csv(clean_data_path)
 
@@ -30,7 +31,7 @@ temp_16 = data[:,-att["Qn"]//6 ]
 
 def plot3D():
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    surface = ax.plot_surface(T, X, data, cmap=cm.coolwarm, linewidth=0.3, antialiased=True, alpha=0.5)
+    surface = ax.plot_surface(T, X, data, cmap=cm.coolwarm, linewidth=0.3, antialiased=True, alpha=0.35)
 
     ax.plot(t, temp_0, x[att["Qn"]//6 + att["Qn"]//15] ,zdir="y", color="k")
     ax.plot(t, temp_8, x[att["Qn"]//2 + att["Qn"]//10 +1] ,zdir="y", color="k")
@@ -39,19 +40,18 @@ def plot3D():
     ax.set_zlim(np.min(data), np.max(data))
     ax.zaxis.set_major_locator(LinearLocator(10))
     ax.zaxis.set_major_formatter("{x:.1f}")
-    ax.tick_params(axis='z', labelsize='smaller', pad=7.0)
+    ax.tick_params(axis='z', labelsize='smaller', pad=7)
     ax.tick_params(axis='x', labelsize='smaller')
     ax.tick_params(axis='y', labelsize='smaller')
     fig.colorbar(surface, shrink=0.5, aspect=5, location="bottom")
     ax.set_xlabel("Temps [min]")
-    ax.set_ylabel("Distance [m]", labelpad=10)
-    ax.set_zlabel("Température [$\degree K $]", labelpad=30)
+    ax.set_ylabel("Distance [m]", labelpad=15)
+    ax.set_zlabel("Température [$\degree K $]", labelpad=40)
     ax.zaxis.set_rotate_label(False)
     ax.yaxis.set_rotate_label(False)
     ax.view_init(elev=25, azim=-113, roll=0)
     plt.show()
     
-
 print(data_exp["DATE"].shape[0], att["temps_simulation"])
 time_exp = np.linspace(0, data_exp["DATE"].shape[0]*10/60, num=data_exp["DATE"].shape[0])
 print(time_exp.shape)
@@ -81,5 +81,5 @@ def profil():
     axs.legend()
     plt.show()
     
-#profil()
+# profil()
 plot3D()

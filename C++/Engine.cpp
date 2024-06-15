@@ -121,7 +121,7 @@ class Heater: public Clock {
                     long double res = (dt/Re)*((ke/pow(dx,2))*(T_p[ip1] -2*T_p[i] + T_p[im1]) - (Rf_eq/pow(dx,2)*(T_p[i]-T_p[im1]))) + T_p[i];
                     T.at(i) = res;
                 }
-                // Bondary conditions
+                // Boundary conditions
                 T.at(Qn-1) = T[Qn-2];
                 }
             else { /* gaz outlet */
@@ -139,7 +139,7 @@ class Heater: public Clock {
         void assign_speed(void){
             // première approximation, vitesse linéaire avec la distance en x
             // y = mx + b
-            
+
             for (int i=0; i < Qn ; i++ ) {
                 long double res = (i*dx/L)*(speed_final-speed_ini) + speed_ini;
                 Speed.at(i) = res;
@@ -156,7 +156,7 @@ class Heater: public Clock {
             }
             cout << "\n";
         }
-        void assign_phase(){ 
+        void assign_phase(){
             int i = floor(time/phase_time);
                 switch ( i % 3)  {
                     case 0:
@@ -203,7 +203,7 @@ class Heater: public Clock {
 };
 
 int main(int argc, char* argv[]) {
-    // ./Engine 300 1.6 -> définir Temperature initiale "300" et Longueur du garnissage "1.6" 
+    // ./Engine [longueur] [vitesse initiale du fluide] [vitesse de sortie du fluide] [nombre de changement de phase]
     float L = atof(argv[1]);
     float si = atof(argv[2]); // utilisé 1
     float sf = atof(argv[3]); //  utilisé 1.5
